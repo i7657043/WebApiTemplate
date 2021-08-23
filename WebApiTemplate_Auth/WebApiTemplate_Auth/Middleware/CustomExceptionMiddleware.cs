@@ -24,13 +24,13 @@ namespace WebApiTemplate_Auth
             {
                 await _next(httpContext);
             }
-            catch (CustomHttpRequestException ex) //For inter-api communication exceptions (Not Expected behaviour)
+            catch (CustomException ex) 
             {
                 _logger.LogError("Custom HTTP Request Error: Problem contacting {TargetUrl}", ex.TargetUrl);
 
                 await _exceptionHandler.HandleCustomHttpRequestExceptionAsync(httpContext, ex);
             }
-            catch (Exception ex) //For everything else (Not Expected behaviour)
+            catch (Exception ex) 
             {
                 _logger.LogCritical("Unexpected Exception: {@Exception}", ex);
 

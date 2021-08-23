@@ -3,7 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace WebApiTemplate_Auth
 {
@@ -24,6 +28,28 @@ namespace WebApiTemplate_Auth
                 .AddSingleton<IExampleApiRepository, ExampleApiRepository>();
 
             services.AddControllers();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "JwtScheme";
+
+            }).AddJwtBearer("JwtScheme", options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = Configuration.GetValue<string>("Tokens:JwtIssuer"),
+                    ValidAudience = Configuration["Tokens:JwtAudience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:JwtSigningKey"])),
+                    ClockSkew = TimeSpan.Zero,
+                    RequireExpirationTime = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true
+                };
+            });
 
             services.AddSwaggerGen(option =>
             {

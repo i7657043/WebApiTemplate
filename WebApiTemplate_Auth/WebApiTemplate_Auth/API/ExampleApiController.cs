@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace WebApiTemplate_Auth
 {
+    [Authorize(AuthenticationSchemes = "JwtScheme")]
     [Route("[controller]")]
     public class ExampleApiController : Controller
     {
@@ -29,6 +31,7 @@ namespace WebApiTemplate_Auth
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [HttpGet]
         [Route("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAsync(int id = 0)
         {
             ProviderResponse<List<string>> response = await _apiProvider.GetAsync(id);

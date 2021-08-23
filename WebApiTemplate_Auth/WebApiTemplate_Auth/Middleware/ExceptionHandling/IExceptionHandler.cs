@@ -6,7 +6,7 @@ namespace WebApiTemplate_Auth
 {
     public interface IExceptionHandler
     {
-        Task HandleCustomHttpRequestExceptionAsync(HttpContext context, CustomHttpRequestException exception);
+        Task HandleCustomHttpRequestExceptionAsync(HttpContext context, CustomException exception);
         Task HandleExceptionAsync(HttpContext context, Exception exception);
     }
 }

@@ -20,7 +20,7 @@ namespace WebApiTemplate_Auth
             _environment = environment;
         }
 
-        public async Task HandleCustomHttpRequestExceptionAsync(HttpContext context, CustomHttpRequestException exception)
+        public async Task HandleCustomHttpRequestExceptionAsync(HttpContext context, CustomException exception)
         {
             context.Response.ContentType = HttpResponseContentType.JSON;
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
