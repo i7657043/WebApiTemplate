@@ -5,6 +5,7 @@
   * JWT Authentication
   * Gateway with JWT Authentication
 
-* Each Project template out of the box has:
+* All Project templates out of the box contain:
+  * API (Controllers), BLL (Providers) and DAL (Repositories) structure with constructor DI configured
   * Custom Exception Handling middleware
-  * Swashbuckle API documentation
+  * Swagger-Swashbuckle OpenAPI documentation
