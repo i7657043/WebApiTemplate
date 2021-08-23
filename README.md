@@ -6,6 +6,7 @@
   * Gateway with JWT Authentication
 
 * All Project templates out of the box contain:
-  * API (Controllers), BLL (Providers) and DAL (Repositories) structure with constructor DI configured
+  * API (Controllers), BLL (Providers) and DAL (Repositories) structure with constructor DI
   * Custom Exception Handling middleware
   * Swagger-Swashbuckle OpenAPI documentation
+  * Serilog File and Console (file configured) logging
