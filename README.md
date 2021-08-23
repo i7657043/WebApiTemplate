@@ -13,7 +13,7 @@ All Project templates out of the box contain:
 
 #### Usage
 
-First Open .sln in Visual Studio:
+First open the .sln file of the type of Project Template you want to use (with or without auth, etc.) in Visual Studio:
   1. Click the "Project" tab
   2. Choose "Export Template"
   3. Choose "Project Template" and press "Next"
