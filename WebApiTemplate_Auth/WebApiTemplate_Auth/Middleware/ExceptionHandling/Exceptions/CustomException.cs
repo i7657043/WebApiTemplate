@@ -5,14 +5,12 @@ namespace WebApiTemplate_Auth
 {
     public class CustomException : Exception
     {
-        public InnerError InnerError { get; }
-        public string TargetUrl { get; }
         public HttpStatusCode HttpStatusCode { get; }
+        public InnerError InnerError { get; }
 
-        public CustomException(HttpStatusCode httpStatusCode, string targetUrl, InnerError innerError = null)
+        public CustomException(HttpStatusCode httpStatusCode, InnerError innerError = null)
         {
             HttpStatusCode = httpStatusCode;
-            TargetUrl = targetUrl;
             InnerError = innerError;
         }
     }

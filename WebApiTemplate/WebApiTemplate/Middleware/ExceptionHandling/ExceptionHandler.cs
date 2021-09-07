@@ -20,15 +20,31 @@ namespace WebApiTemplate
             _environment = environment;
         }
 
-        public async Task HandleCustomHttpRequestExceptionAsync(HttpContext context, CustomHttpRequestException exception)
+        public async Task HandleUpstreamHttpRequestExceptionAsync(HttpContext context, UpstreamHttpRequestException exception)
         {
             context.Response.ContentType = HttpResponseContentType.JSON;
-            context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = (int)HttpStatusCode.BadGateway;
 
             ApiError errorResponse = new ApiError
             {
                 Target = context.Request.Path,
-                Message = $"Problem contacting {exception.TargetUrl} Result from contacting external web resource: HTTP Status Code {(int)exception.HttpStatusCode}"
+                Message = $"Problem contacting external web resource: {exception.TargetUrl} - external HTTP Status Code {(int)exception.UpstreamHttpResponseStatusCode}"
+            };
+
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
+        }
+
+        public async Task HandleCustomExceptionAsync(HttpContext context, CustomException exception)
+        {
+            context.Response.ContentType = HttpResponseContentType.JSON;
+            context.Response.StatusCode = exception.HttpStatusCode != 0
+                ? (int)exception.HttpStatusCode
+                : (int)HttpStatusCode.InternalServerError;
+
+            ApiError errorResponse = new ApiError
+            {
+                Target = context.Request.Path,
+                Message = "Sorry, Something went wrong"
             };
 
             await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
@@ -42,7 +58,7 @@ namespace WebApiTemplate
             ApiError errorResponse = new ApiError
             {
                 Target = context.Request.Path,
-                Message = "Sorry, Something went wrong"
+                Message = "Sorry, something went wrong"
             };
 
             await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));

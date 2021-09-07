@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace WebApiTemplate
+namespace WebApiTemplate_Auth
 {
     public class CustomExceptionMiddleware
     {
@@ -24,11 +24,17 @@ namespace WebApiTemplate
             {
                 await _next(httpContext);
             }
-            catch (CustomHttpRequestException ex) //For inter-api communication exceptions (Not Expected behaviour)
+            catch (UpstreamHttpRequestException ex) //For inter-api communication exceptions (Expected behaviour)
             {
-                _logger.LogError("Custom HTTP Request Error: Problem contacting {TargetUrl}", ex.TargetUrl);
+                _logger.LogError("Custom HTTP Request Error. Exception: {ex}", ex.TargetUrl, ex);
 
-                await _exceptionHandler.HandleCustomHttpRequestExceptionAsync(httpContext, ex);
+                await _exceptionHandler.HandleUpstreamHttpRequestExceptionAsync(httpContext, ex);
+            }
+            catch (CustomException ex) //Other exceptions (Expected behaviour)
+            {
+                _logger.LogError("Custom Error");
+
+                await _exceptionHandler.HandleExceptionAsync(httpContext, ex);
             }
             catch (Exception ex) //For everything else (Not Expected behaviour)
             {
