@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using WebApiTemplate.Libs;
 
 namespace WebApiTemplate
 {
     public interface IExampleApiProvider
     {
-        Task<ProviderResponse<List<string>>> GetAsync(int id);
+        Task<List<string>> GetAsync(int id);
     }
 }

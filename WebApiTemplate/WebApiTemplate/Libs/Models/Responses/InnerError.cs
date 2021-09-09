@@ -1,4 +1,4 @@
-﻿namespace WebApiTemplate
+﻿namespace WebApiTemplate.Libs
 {
     public class InnerError
     {

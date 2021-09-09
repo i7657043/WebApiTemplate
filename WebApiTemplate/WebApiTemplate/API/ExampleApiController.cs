@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using WebApiTemplate.Libs;
 
 namespace WebApiTemplate
 {
@@ -31,12 +32,12 @@ namespace WebApiTemplate
         [Route("{id}")]
         public async Task<IActionResult> GetAsync(int id = 0)
         {
-            ProviderResponse<List<string>> response = await _apiProvider.GetAsync(id);
+            List<string> response = await _apiProvider.GetAsync(id);
 
-            return response.SendResponse();
+            return new OkObjectResult(response);
 
             //Use below for Creation (Insert) responses
-            //return response.SendResponse(ControllerContext.GetCreatedAtRoute(id.ToString()));
+            //return new CreatedResult(ControllerContext.GetCreatedAtRoute(id.ToString()), response);
         }        
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace WebApiTemplate
+namespace WebApiTemplate.Libs
 {
     public class CustomExceptionMiddleware
     {
@@ -26,15 +26,15 @@ namespace WebApiTemplate
             }
             catch (UpstreamHttpRequestException ex) //For inter-api communication exceptions (Expected behaviour)
             {
-                _logger.LogError("Custom HTTP Request Error. Exception: {ex}", ex.TargetUrl, ex);
+                _logger.LogError("Upstream HTTP Request Exception. Exception: {@Exception}", ex);
 
                 await _exceptionHandler.HandleUpstreamHttpRequestExceptionAsync(httpContext, ex);
             }
-            catch (CustomException ex) //Other exceptions (Expected behaviour)
+            catch (HttpResponseException ex) //For 4XX and 5XX responses (Expected behaviour)
             {
-                _logger.LogError("Custom Error");
+                _logger.LogInformation("HTTP Response Exception. HTTP Status Code: {httpStatusCode}", ex.HttpStatusCode);
 
-                await _exceptionHandler.HandleExceptionAsync(httpContext, ex);
+                await _exceptionHandler.HandleHttpResponseExceptionAsync(httpContext, ex);
             }
             catch (Exception ex) //For everything else (Not Expected behaviour)
             {

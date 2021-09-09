@@ -2,12 +2,12 @@
 using System;
 using System.Threading.Tasks;
 
-namespace WebApiTemplate
+namespace WebApiTemplate.Libs
 {
     public interface IExceptionHandler
     {
         Task HandleUpstreamHttpRequestExceptionAsync(HttpContext context, UpstreamHttpRequestException exception);
-        Task HandleCustomExceptionAsync(HttpContext context, CustomException exception);
+        Task HandleHttpResponseExceptionAsync(HttpContext context, HttpResponseException exception);
         Task HandleExceptionAsync(HttpContext context, Exception exception);
     }
 }

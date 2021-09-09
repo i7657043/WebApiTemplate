@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace WebApiTemplate
+namespace WebApiTemplate.Libs
 {
     public class UpstreamHttpRequestException : Exception
     {

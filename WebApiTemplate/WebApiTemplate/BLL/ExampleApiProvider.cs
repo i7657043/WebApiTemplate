@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using WebApiTemplate.Libs;
 
 namespace WebApiTemplate
 {
@@ -13,13 +14,14 @@ namespace WebApiTemplate
             _apiRepository = apiRepository;
         }
 
-        public async Task<ProviderResponse<List<string>>> GetAsync(int id)
+        public async Task<List<string>> GetAsync(int id)
         {
-            await Task.Delay(500);
-
             List<string> response = await _apiRepository.GetAsync(id);
 
-            return new ProviderResponse<List<string>>(HttpStatusCode.OK, response);
+            if (response.Count == 0)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return response;
         }
     }
 }

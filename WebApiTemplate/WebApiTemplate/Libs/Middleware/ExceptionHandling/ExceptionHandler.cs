@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using WebApiTemplate;
 using Newtonsoft.Json;
 
-namespace WebApiTemplate
+namespace WebApiTemplate.Libs
 {
     public class ExceptionHandler : IExceptionHandler
     {
@@ -25,27 +24,21 @@ namespace WebApiTemplate
             context.Response.ContentType = HttpResponseContentType.JSON;
             context.Response.StatusCode = (int)HttpStatusCode.BadGateway;
 
-            ApiError errorResponse = new ApiError
+            ApiError errorResponse = new ApiError()
             {
                 Target = context.Request.Path,
-                Message = $"Problem contacting external web resource: {exception.TargetUrl} - external HTTP Status Code {(int)exception.UpstreamHttpResponseStatusCode}"
+                Message = $"Problem contacting external web resource: {exception.TargetUrl} (HTTP Status Code: {(int)exception.UpstreamHttpResponseStatusCode})"
             };
 
             await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
         }
 
-        public async Task HandleCustomExceptionAsync(HttpContext context, CustomException exception)
+        public async Task HandleHttpResponseExceptionAsync(HttpContext context, HttpResponseException exception)
         {
             context.Response.ContentType = HttpResponseContentType.JSON;
-            context.Response.StatusCode = exception.HttpStatusCode != 0
-                ? (int)exception.HttpStatusCode
-                : (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = (int)exception.HttpStatusCode;
 
-            ApiError errorResponse = new ApiError
-            {
-                Target = context.Request.Path,
-                Message = "Sorry, Something went wrong"
-            };
+            ApiError errorResponse = new ApiError(exception.HttpStatusCode, $"{context.Request.Method}: {context.Request.Path}");
 
             await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
         }
@@ -55,11 +48,7 @@ namespace WebApiTemplate
             context.Response.ContentType = HttpResponseContentType.JSON;
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            ApiError errorResponse = new ApiError
-            {
-                Target = context.Request.Path,
-                Message = "Sorry, something went wrong"
-            };
+            ApiError errorResponse = new ApiError(HttpStatusCode.InternalServerError, $"{context.Request.Method}: {context.Request.Path}");
 
             await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
         }

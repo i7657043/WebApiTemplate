@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Net;
 
-namespace WebApiTemplate
+namespace WebApiTemplate.Libs
 {
-    public class CustomException : Exception
+    public class HttpResponseException : Exception
     {
         public HttpStatusCode HttpStatusCode { get; }
         public InnerError InnerError { get; }
 
-        public CustomException(HttpStatusCode httpStatusCode, InnerError innerError = null)
+        public HttpResponseException(HttpStatusCode httpStatusCode, InnerError innerError = null)
         {
             HttpStatusCode = httpStatusCode;
             InnerError = innerError;
