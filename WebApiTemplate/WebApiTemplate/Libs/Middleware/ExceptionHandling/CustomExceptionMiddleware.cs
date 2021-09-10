@@ -26,15 +26,14 @@ namespace WebApiTemplate.Libs
             {
                 await _next(httpContext);
                                 
-                if (httpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized || httpContext.Response.StatusCode == (int)HttpStatusCode.Forbidden)
-                    throw new HttpResponseException((HttpStatusCode)httpContext.Response.StatusCode);
-
-                //For Route URI not found
-                if (httpContext.Response.StatusCode == (int)HttpStatusCode.NotFound)
+                switch (httpContext.Response.StatusCode)
                 {
-                    ApiError errorResponse = new ApiError("The route URI you requested does not exist", httpContext.Request.Path);
+                    case (int)HttpStatusCode.Unauthorized:
+                    case (int)HttpStatusCode.Forbidden:
+                        throw new HttpResponseException((HttpStatusCode)httpContext.Response.StatusCode);
 
-                    await _exceptionHandler.HandleExceptionAsync(httpContext, errorResponse, HttpStatusCode.NotFound);
+                    case (int)HttpStatusCode.NotFound:
+                        throw new RouteNotFoundException();
                 }
             }
             catch (UpstreamHttpRequestException ex) //For inter-api communication exceptions (Expected behaviour)
@@ -55,6 +54,14 @@ namespace WebApiTemplate.Libs
                 _logger.LogInformation("HTTP Response Exception. HTTP Status Code: {httpStatusCode}. Response: {@Response}", ex.HttpStatusCode, errorResponse);
 
                 await _exceptionHandler.HandleExceptionAsync(httpContext, errorResponse, ex.HttpStatusCode);
+            }
+            catch (RouteNotFoundException ex) //For route URI not found (Not Expected behaviour)
+            {
+                ApiError errorResponse = new ApiError("The requested route URI does not exist", httpContext.Request.Path);
+
+                _logger.LogInformation("Requested route URI: {requestUri} does not exist", httpContext.Request.Path);
+
+                await _exceptionHandler.HandleExceptionAsync(httpContext, errorResponse, HttpStatusCode.NotFound);
             }
             catch (Exception ex) //For everything else (Not Expected behaviour)
             {
