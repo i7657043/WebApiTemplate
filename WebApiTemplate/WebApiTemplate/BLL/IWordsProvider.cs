@@ -4,8 +4,9 @@ using WebApiTemplate.Libs;
 
 namespace WebApiTemplate
 {
-    public interface IExampleApiProvider
+    public interface IWordsProvider
     {
         Task<List<string>> GetAsync(int id);
+        Task<Word> AddAsync(Word word);
     }
 }

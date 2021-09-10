@@ -1,9 +1,14 @@
-﻿namespace WebApiTemplate.Libs
+﻿using System.Collections.Generic;
+
+namespace WebApiTemplate.Libs
 {
     public class InnerError
     {
-        public string Code { get; set; }
-        public string Message { get; set; }
-        public InnerError NextInnerError { get; set; }
+        public List<string> Messages { get; set; }
+
+        public InnerError(List<string> messages)
+        {
+            Messages = messages;
+        }
     }
 }

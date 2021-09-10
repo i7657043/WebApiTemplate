@@ -5,11 +5,11 @@ using WebApiTemplate.Libs;
 
 namespace WebApiTemplate
 {
-    public class ExampleApiProvider : IExampleApiProvider
+    public class WordsProvider : IWordsProvider
     {
-        private readonly IExampleApiRepository _apiRepository;
+        private readonly IWordsRepository _apiRepository;
 
-        public ExampleApiProvider(IExampleApiRepository apiRepository)
+        public WordsProvider(IWordsRepository apiRepository)
         {
             _apiRepository = apiRepository;
         }
@@ -23,5 +23,10 @@ namespace WebApiTemplate
 
             return response;
         }
+        public Task<Word> AddAsync(Word word)
+        {
+            return _apiRepository.AddAsync(word);
+        }
+
     }
 }

@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Text;
 using WebApiTemplate.Libs;
 
 namespace WebApiTemplate
@@ -21,8 +24,8 @@ namespace WebApiTemplate
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IExceptionHandler, ExceptionHandler>()
-                .AddSingleton<IExampleApiProvider, ExampleApiProvider>()
-                .AddSingleton<IExampleApiRepository, ExampleApiRepository>();
+                .AddSingleton<IWordsProvider, WordsProvider>()
+                .AddSingleton<IWordsRepository, WordsRepository>();
 
             services.AddControllers();
 
@@ -44,16 +47,14 @@ namespace WebApiTemplate
 
             if (env.IsDevelopment())
             {
-                //app.UseDeveloperExceptionPage();
-            }
+                app.UseSwagger();
 
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1");
-                c.RoutePrefix = string.Empty;
-            });
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1");
+                    c.RoutePrefix = string.Empty;
+                });
+            }           
 
             app.UseHttpsRedirection();
 

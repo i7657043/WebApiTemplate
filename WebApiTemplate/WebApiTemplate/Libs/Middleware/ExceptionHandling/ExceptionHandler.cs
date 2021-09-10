@@ -19,38 +19,12 @@ namespace WebApiTemplate.Libs
             _environment = environment;
         }
 
-        public async Task HandleUpstreamHttpRequestExceptionAsync(HttpContext context, UpstreamHttpRequestException exception)
+        public async Task HandleExceptionAsync(HttpContext context, ApiError error, HttpStatusCode httpStatusCode)
         {
             context.Response.ContentType = HttpResponseContentType.JSON;
-            context.Response.StatusCode = (int)HttpStatusCode.BadGateway;
+            context.Response.StatusCode = (int)httpStatusCode;
 
-            ApiError errorResponse = new ApiError()
-            {
-                Target = context.Request.Path,
-                Message = $"Problem contacting external web resource: {exception.TargetUrl} (HTTP Status Code: {(int)exception.UpstreamHttpResponseStatusCode})"
-            };
-
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
-        }
-
-        public async Task HandleHttpResponseExceptionAsync(HttpContext context, HttpResponseException exception)
-        {
-            context.Response.ContentType = HttpResponseContentType.JSON;
-            context.Response.StatusCode = (int)exception.HttpStatusCode;
-
-            ApiError errorResponse = new ApiError(exception.HttpStatusCode, $"{context.Request.Method}: {context.Request.Path}");
-
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
-        }
-
-        public async Task HandleExceptionAsync(HttpContext context, Exception exception)
-        {
-            context.Response.ContentType = HttpResponseContentType.JSON;
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-            ApiError errorResponse = new ApiError(HttpStatusCode.InternalServerError, $"{context.Request.Method}: {context.Request.Path}");
-
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(error));
         }
     }
 }

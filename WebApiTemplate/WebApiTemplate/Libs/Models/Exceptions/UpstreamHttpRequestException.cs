@@ -9,9 +9,9 @@ namespace WebApiTemplate.Libs
         public string TargetUrl { get; }
         public InnerError InnerError { get; }
 
-        public UpstreamHttpRequestException(HttpStatusCode httpStatusCode, string targetUrl, InnerError innerError = null)
+        public UpstreamHttpRequestException(HttpStatusCode upstreamHttpStatusCode, string targetUrl, InnerError innerError = null)
         {
-            UpstreamHttpResponseStatusCode = httpStatusCode;
+            UpstreamHttpResponseStatusCode = upstreamHttpStatusCode;
             TargetUrl = targetUrl;
             InnerError = innerError;
         }

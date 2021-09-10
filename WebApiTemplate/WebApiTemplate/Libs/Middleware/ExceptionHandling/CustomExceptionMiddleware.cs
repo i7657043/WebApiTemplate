@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace WebApiTemplate.Libs
@@ -23,24 +25,44 @@ namespace WebApiTemplate.Libs
             try
             {
                 await _next(httpContext);
+                                
+                if (httpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized || httpContext.Response.StatusCode == (int)HttpStatusCode.Forbidden)
+                    throw new HttpResponseException((HttpStatusCode)httpContext.Response.StatusCode);
+
+                //For Route URI not found
+                if (httpContext.Response.StatusCode == (int)HttpStatusCode.NotFound)
+                {
+                    ApiError errorResponse = new ApiError("The route URI you requested does not exist", httpContext.Request.Path);
+
+                    await _exceptionHandler.HandleExceptionAsync(httpContext, errorResponse, HttpStatusCode.NotFound);
+                }
             }
             catch (UpstreamHttpRequestException ex) //For inter-api communication exceptions (Expected behaviour)
             {
-                _logger.LogError("Upstream HTTP Request Exception. Exception: {@Exception}", ex);
+                ApiError errorResponse = new ApiError(HttpStatusCode.BadGateway, httpContext.Request.Path, new InnerError(new List<string> 
+                {
+                    $"Problem contacting external web resource: {ex.TargetUrl} - external HTTP status code: {(int)ex.UpstreamHttpResponseStatusCode}"
+                }));
 
-                await _exceptionHandler.HandleUpstreamHttpRequestExceptionAsync(httpContext, ex);
+                _logger.LogError("Upstream HTTP Request Exception. Exception: {@Exception}. Response: {@Response}", ex, errorResponse);
+
+                await _exceptionHandler.HandleExceptionAsync(httpContext, errorResponse, HttpStatusCode.BadGateway);
             }
             catch (HttpResponseException ex) //For 4XX and 5XX responses (Expected behaviour)
             {
-                _logger.LogInformation("HTTP Response Exception. HTTP Status Code: {httpStatusCode}", ex.HttpStatusCode);
+                ApiError errorResponse = new ApiError(ex.HttpStatusCode, httpContext.Request.Path, ex.InnerError);
 
-                await _exceptionHandler.HandleHttpResponseExceptionAsync(httpContext, ex);
+                _logger.LogInformation("HTTP Response Exception. HTTP Status Code: {httpStatusCode}. Response: {@Response}", ex.HttpStatusCode, errorResponse);
+
+                await _exceptionHandler.HandleExceptionAsync(httpContext, errorResponse, ex.HttpStatusCode);
             }
             catch (Exception ex) //For everything else (Not Expected behaviour)
             {
-                _logger.LogCritical("Unexpected Exception: {@Exception}", ex);
+                ApiError errorResponse = new ApiError(HttpStatusCode.InternalServerError, httpContext.Request.Path);
 
-                await _exceptionHandler.HandleExceptionAsync(httpContext, ex);
+                _logger.LogCritical("Unexpected Exception: {@Exception}. Response: {@Response}", ex, errorResponse);
+
+                await _exceptionHandler.HandleExceptionAsync(httpContext, errorResponse, HttpStatusCode.InternalServerError);
             }
         }
     }
